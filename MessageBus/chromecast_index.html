@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="//www.gstatic.com/cast/sdk/libs/receiver/2.0.0/cast_receiver.js"></script>
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+</head>
+<body style="background: white;">
+	<p>chromecast_index.html -- RECEIVER RESEARCH APP</p>
+	<p id="message"></p>
+  <script>
+		window.mediaElement = document.getElementById('media');
+		window.mediaManager = new cast.receiver.MediaManager(window.mediaElement);
+		window.castReceiverManager = cast.receiver.CastReceiverManager.getInstance();
+		// Very important to initialize the message bus before you call castReceiverManager.start()
+		var customMessageBus = castReceiverManager.getCastMessageBus('urn:x-cast:org.jaredstevens.research');
+		customMessageBus.onMessage = function(event) {
+			$("#message").html("Got a message: "+event.data);
+		}
+		window.castReceiverManager.start();
+		$("#message").html("Initialized. No messages yet.");
+  </script>
+</body>
+</html>

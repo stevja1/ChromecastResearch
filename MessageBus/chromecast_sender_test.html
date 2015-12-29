@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="https://www.gstatic.com/cv/js/sender/v1/cast_sender.js"></script>
+<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script>
+var session;
+var applicationId = "XXXXXXXX";
+window['__onGCastApiAvailable'] = function(loaded, errorInfo) {
+  if (loaded) {
+    initializeCastApi();
+  } else {
+    console.log(errorInfo);
+  }
+}
+initializeCastApi = function() {
+  var sessionRequest = new chrome.cast.SessionRequest(applicationId);
+  var apiConfig = new chrome.cast.ApiConfig(sessionRequest,
+    sessionListener,
+    receiverListener);
+  chrome.cast.initialize(apiConfig, onInitSuccess, onInitError);
+};
+
+onInitSuccess = function(input) {
+  console.log("onInitSuccess: Got here.");
+};
+
+onInitError = function(input) {
+  console.log("onInitError: Got here.");
+};
+
+receiverListener = function(e) {
+  if( e === chrome.cast.ReceiverAvailability.AVAILABLE) {
+    chrome.cast.requestSession(onRequestSessionSuccess, onLaunchError);
+  }
+};
+
+function onRequestSessionSuccess(e) {
+	session = e;
+	console.log("Got a session.");
+}
+
+onLaunchError = function(e) {
+  console.log("onLaunchError: Got here.");
+};
+
+sessionListener = function(input) {
+	if(input.sessionId != null) {
+		session = new chrome.cast.Session(input.sessionId, applicationId, new Array(), new Array());
+	}
+  console.log("sessionListener: Got here.");
+};
+
+function sendMessage() {
+	var messageText = $("#messageText").val();
+	var namespace = "urn:x-cast:org.jaredstevens.research";
+	session.sendMessage(namespace, '{"command":"message","url":"'+messageText+'"}', messageSuccess, messageFailure);
+}
+
+function messageSuccess(e) {
+	console.log("That worked.");
+}
+
+function messageFailure(e) {
+	console.log("That sucked.");
+}
+</script>
+</head>
+<body>
+Hi there.<br />
+<input id="messageText" type="text" />
+<input type="button" value="Send a message" onClick="sendMessage()" />
+</body>
+</html>
